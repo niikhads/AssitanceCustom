@@ -5,8 +5,24 @@ import os
 import time
 from datetime import datetime
 import random
-from random import choice
+from pydub import AudioSegment
+import webbrowser 
+
+
+
+
 r = sr.Recognizer()
+
+def speeding():
+    in_path = 'answer.mp3'
+    ex_path = 'speed.mp3'
+    sound = AudioSegment.from_file(in_path)
+    faster_sound = speed_swifter(sound, 1.1)
+    faster_sound.export(ex_path, format="mp3")
+
+def speed_swifter(sound, speed=1.0):
+    sound_with_altered_frame_rate = sound._spawn(sound.raw_data, overrides={"frame_rate": int(sound.frame_rate * speed)})
+    return sound_with_altered_frame_rate
 
 def record(ask=False):
     with sr.Microphone() as source:
@@ -24,12 +40,12 @@ def record(ask=False):
 
 def response(voice):
     if "hello" in voice:
-        speak("Hello my friend")
+        speak("Hello, my friend")
     if "help me" in voice:
         speak("How can I help you?")
-    if "thanks" in voice or "thank you" in voice or "thanks you" in voice or "thank you very much" in voice:
+    if any(word in voice for word in ["thanks", "thank you"]):
         speak("You're welcome")
-    if "good bye" in voice or "goodbye" in voice:
+    if any(word in voice for word in ["goodbye", "good bye"]):
         speak("Goodbye")
         exit()
     if "what day is today" in voice:
@@ -43,23 +59,32 @@ def response(voice):
             "Saturday": "Senbe",
             "Sunday": "Bazar"
         }
-        speak(today_map.get(today, today))
-
-    if "what time is it" in voice :
-        selection = ["Saat indi : ", "Hemen baxiram : "]
+        speak(today_map.get(today, "Unknown day"))
+    if "what time is it" in voice:
+        selections = ["Saat indi: ", "Hemen baxiram: "]
         clock = datetime.now().strftime("%H:%M")
-        selection = random.choice(selection)
+        selection = random.choice(selections)
         speak(selection + clock)
-
+        
+        
+    if "google search" in voice:
+        speak("what search I look for you?")
+        search = record()
+        url = "https://www.google.com/search?q={}".format(search)
+        webbrowser.get().open(url)
+        speak("{} I'm listing the ones I could find on Google for you.".format(search))
 
 def speak(text):
     tts = gTTS(text=text, lang="en", slow=False)
     file = "answer.mp3"
     tts.save(file)
+    speeding()
+    playsound("speed.mp3")
     playsound(file)
     os.remove(file)
+    os.remove("speed.mp3")
 
-speak("Salam. Men Azerbaycan Gomruk Assistani. Zehmet olmasa himni dinleyin")
+speak("Hello. I am Azerbaijan Customs Service Voice Assistant. Please listen to the hymn.")
 playsound("Ding.mp3")
 #playsound("Himn.mp3")
 
