@@ -38,17 +38,19 @@ def record(ask=False):
             print("Assistant: The system is not working at the moment")
         return voice
 
-def response(voice):
-    if "hello" in voice:
+
+
+def response(sound):
+     if "hello" in sound:
         speak("Hello, my friend")
-    if "help me" in voice:
+     if "help me" in sound:
         speak("How can I help you?")
-    if any(word in voice for word in ["thanks", "thank you"]):
+     if any(word in sound for word in ["thanks", "thank you"]):
         speak("You're welcome")
-    if any(word in voice for word in ["goodbye", "good bye"]):
+     if any(word in sound for word in ["goodbye", "good bye"]):
         speak("Goodbye")
         exit()
-    if "what day is today" in voice:
+     if "what day is today" in sound:
         today = time.strftime("%A")
         today_map = {
             "Monday": "Bazar Ertesi",
@@ -60,19 +62,41 @@ def response(voice):
             "Sunday": "Bazar"
         }
         speak(today_map.get(today, "Unknown day"))
-    if "what time is it" in voice:
+     if "what time is it" in sound:
         selections = ["Saat indi: ", "Hemen baxiram: "]
         clock = datetime.now().strftime("%H:%M")
         selection = random.choice(selections)
         speak(selection + clock)
         
         
-    if "google search" in voice:
+     if "google search" in sound:
         speak("what search I look for you?")
         search = record()
         url = "https://www.google.com/search?q={}".format(search)
         webbrowser.get().open(url)
         speak("{} I'm listing the ones I could find on Google for you.".format(search))
+        
+        
+     if "open app" in sound:
+         speak ("Which app the open ?")
+         runApp = record()
+         runApp = runApp.lower()
+         if "notepad" in runApp:
+            os.startfile("C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.exe")
+        #  if "notepad" in runApp:
+        #      os.startfile     #url ile
+         else:
+            speak("This app is not available on the computer")
+         
+     if " write note" in voice:
+        speak ("Please say me text name")
+        txtFile = record() + ".txt"
+        speak("Please say me write in note")
+        theText = record()
+        f = open(txtFile,"w",encoding= "utf-8")
+        f.writelines(theText)
+        f.close()
+
 
 def speak(text):
     tts = gTTS(text=text, lang="en", slow=False)
@@ -84,6 +108,18 @@ def speak(text):
     os.remove(file)
     os.remove("speed.mp3")
 
+def test(voice):
+    if "ben"  in voice:
+      playsound("Ding.mp3")
+      voice = record()
+      if voice  != '':
+       sound = voice.lower()
+       print(voice.capitalize())
+       response(sound)
+        
+        
+
+
 speak("Hello. I am Azerbaijan Customs Service Voice Assistant. Please listen to the hymn.")
 playsound("Ding.mp3")
 #playsound("Himn.mp3")
@@ -92,5 +128,6 @@ while True:
     voice = record()
     if voice:
         voice = voice.lower()
-        print(voice.capitalize())
-        response(voice)
+        print(voice.capitalize())       
+      #  response(voice)  # asstiani oyatmaq ucun test istifade et
+        test(voice)
